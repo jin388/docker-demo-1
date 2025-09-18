@@ -1,0 +1,31 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    container_name: api
+    volumes: 
+    # перемещаем конфиг внутрь контейнера
+      - ./.env:/opt/app/.env
+    networks:
+      - app-network
+    depends_on:
+      - rmq
+
+# AMQP_HOSTNAME=rmq
+# AMQP_USER=admin
+# AMQP_PASSWORD=admin in .env
+# https://hub.docker.com/_/rabbitmq
+  rmq:
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - app-network
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+networks:
+  app-network:
+    driver: bridge
