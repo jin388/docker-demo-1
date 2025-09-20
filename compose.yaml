@@ -1,4 +1,29 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: ./apps/app/Dockerfile
+    restart: always
+    container_name: app
+    ports:
+      - 3001:80
+    networks:
+      - app-network
+
+  converter:
+    build:
+      context: .
+      dockerfile: ./apps/converter/Dockerfile
+    restart: always
+    container_name: converter
+    volumes: 
+    # перемещаем конфиг внутрь контейнера
+      - ./.env:/opt/app/.env
+    networks:
+      - app-network
+    depends_on:
+      - rmq
+
   api:
     build:
       context: .
@@ -8,6 +33,8 @@ services:
     volumes: 
     # перемещаем конфиг внутрь контейнера
       - ./.env:/opt/app/.env
+    ports:
+      - 3002:3000
     networks:
       - app-network
     depends_on:
